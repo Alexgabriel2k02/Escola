@@ -1,0 +1,5 @@
+Flask==2.2.3          
+Flask-SQLAlchemy==2.5.1  
+SQLAlchemy==2.0.18   
+Werkzeug==2.2.3      
+python-dotenv==0.20.0
