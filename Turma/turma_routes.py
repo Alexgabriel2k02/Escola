@@ -1,44 +1,39 @@
 from flask import Blueprint, request, jsonify
-from turma.turmas_model import Turma
-from config import db
+from turma.turmas_model import Turma, listar_turmas, turma_por_id, adicionar_turma, atualizar_turma, excluir_turma
 
 turma_bp = Blueprint('turma', __name__)
 
 @turma_bp.route('/turmas', methods=['GET'])
-def listar_turmas():
-    turmas = Turma.query.all()
-    return jsonify([turma.to_dict() for turma in turmas])
+def listar_todas_turmas():
+    return jsonify(listar_turmas())
 
 @turma_bp.route('/turmas/<int:id>', methods=['GET'])
 def obter_turma(id):
-    turma = Turma.query.get_or_404(id)
-    return jsonify(turma.to_dict())
+    try:
+        turma = turma_por_id(id)
+        return jsonify(turma)
+    except TurmaNaoEncontrada:
+        return jsonify({'error': 'Turma não encontrada'}), 404
 
 @turma_bp.route('/turmas', methods=['POST'])
-def adicionar_turma():
+def adicionar_nova_turma():
     dados = request.get_json()
-    nova_turma = Turma(
-        descricao=dados['descricao'],
-        professor_id=dados['professor_id'],
-        ativo=dados.get('ativo', True)
-    )
-    db.session.add(nova_turma)
-    db.session.commit()
-    return jsonify(nova_turma.to_dict()), 201
+    adicionar_turma(dados)
+    return jsonify({'message': 'Turma adicionada com sucesso!'}), 201
 
 @turma_bp.route('/turmas/<int:id>', methods=['PUT'])
-def atualizar_turma(id):
-    turma = Turma.query.get_or_404(id)
+def atualizar_turma_existente(id):
     dados = request.get_json()
-    turma.descricao = dados['descricao']
-    turma.professor_id = dados['professor_id']
-    turma.ativo = dados.get('ativo', True)
-    db.session.commit()
-    return jsonify(turma.to_dict())
+    try:
+        atualizar_turma(id, dados)
+        return jsonify({'message': 'Turma atualizada com sucesso!'})
+    except TurmaNaoEncontrada:
+        return jsonify({'error': 'Turma não encontrada'}), 404
 
 @turma_bp.route('/turmas/<int:id>', methods=['DELETE'])
-def deletar_turma(id):
-    turma = Turma.query.get_or_404(id)
-    db.session.delete(turma)
-    db.session.commit()
-    return jsonify({'message': 'Turma deletada'}), 204
+def excluir_turma_existente(id):
+    try:
+        excluir_turma(id)
+        return jsonify({'message': 'Turma excluída com sucesso!'}), 200
+    except TurmaNaoEncontrada:
+        return jsonify({'error': 'Turma não encontrada'}), 404

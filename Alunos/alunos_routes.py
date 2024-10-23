@@ -1,52 +1,39 @@
 from flask import Blueprint, request, jsonify
-from aluno.alunos_model import Aluno
-from config import db
+from aluno.alunos_model import Aluno, listar_alunos, aluno_por_id, adicionar_aluno, atualizar_aluno, excluir_aluno
 
 aluno_bp = Blueprint('aluno', __name__)
 
 @aluno_bp.route('/alunos', methods=['GET'])
-def listar_alunos():
-    alunos = Aluno.query.all()
-    return jsonify([aluno.to_dict() for aluno in alunos])
+def listar_todos_alunos():
+    return jsonify(listar_alunos())
 
 @aluno_bp.route('/alunos/<int:id>', methods=['GET'])
 def obter_aluno(id):
-    aluno = Aluno.query.get_or_404(id)
-    return jsonify(aluno.to_dict())
+    try:
+        aluno = aluno_por_id(id)
+        return jsonify(aluno)
+    except AlunoNaoEncontrado:
+        return jsonify({'error': 'Aluno não encontrado'}), 404
 
 @aluno_bp.route('/alunos', methods=['POST'])
-def adicionar_aluno():
+def adicionar_novo_aluno():
     dados = request.get_json()
-    novo_aluno = Aluno(
-        nome=dados['nome'],
-        idade=dados['idade'],
-        data_nascimento=dados['data_nascimento'],
-        nota_primeiro_semestre=dados.get('nota_primeiro_semestre'),
-        nota_segundo_semestre=dados.get('nota_segundo_semestre'),
-        media_final=dados.get('media_final'),
-        turma_id=dados['turma_id']
-    )
-    db.session.add(novo_aluno)
-    db.session.commit()
-    return jsonify(novo_aluno.to_dict()), 201
+    adicionar_aluno(dados)
+    return jsonify({'message': 'Aluno adicionado com sucesso!'}), 201
 
 @aluno_bp.route('/alunos/<int:id>', methods=['PUT'])
-def atualizar_aluno(id):
-    aluno = Aluno.query.get_or_404(id)
+def atualizar_aluno_existente(id):
     dados = request.get_json()
-    aluno.nome = dados['nome']
-    aluno.idade = dados['idade']
-    aluno.data_nascimento = dados['data_nascimento']
-    aluno.nota_primeiro_semestre = dados.get('nota_primeiro_semestre')
-    aluno.nota_segundo_semestre = dados.get('nota_segundo_semestre')
-    aluno.media_final = dados.get('media_final')
-    aluno.turma_id = dados['turma_id']
-    db.session.commit()
-    return jsonify(aluno.to_dict())
+    try:
+        atualizar_aluno(id, dados)
+        return jsonify({'message': 'Aluno atualizado com sucesso!'})
+    except AlunoNaoEncontrado:
+        return jsonify({'error': 'Aluno não encontrado'}), 404
 
 @aluno_bp.route('/alunos/<int:id>', methods=['DELETE'])
-def deletar_aluno(id):
-    aluno = Aluno.query.get_or_404(id)
-    db.session.delete(aluno)
-    db.session.commit()
-    return jsonify({'message': 'Aluno deletado'}), 204
+def excluir_aluno_existente(id):
+    try:
+        excluir_aluno(id)
+        return jsonify({'message': 'Aluno excluído com sucesso!'}), 200
+    except AlunoNaoEncontrado:
+        return jsonify({'error': 'Aluno não encontrado'}), 404
