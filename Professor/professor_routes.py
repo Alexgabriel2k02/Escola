@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from professor.professor_model import Professor, listar_professores, professor_por_id, adicionar_professor, atualizar_professor, excluir_professor
+from .Professor_model import ProfessorNaoEncontrado, listar_professores, professor_por_id, adicionar_professor, atualizar_professor, excluir_professor
 
 professor_bp = Blueprint('professor', __name__)
 
