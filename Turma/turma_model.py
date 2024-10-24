@@ -1,4 +1,4 @@
-from app_config import db
+from config import db
 
 class Turma(db.Model):
     id = db.Column(db.Integer, primary_key=True)

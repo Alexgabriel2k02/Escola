@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from app_config import Config
+from config import Config
 
 # Inicialização do banco de dados
 db = SQLAlchemy()

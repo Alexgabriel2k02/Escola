@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from .alunos_model import AlunoNaoEncontrado, listar_alunos, aluno_por_id, adicionar_aluno, atualizar_aluno, excluir_aluno
-from app_config import db
+from config import db
 
 # Corrigido o nome do blueprint para 'alunos_bp'
 alunos_bp = Blueprint('alunos', __name__)

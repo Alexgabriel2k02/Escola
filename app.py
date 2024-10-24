@@ -1,5 +1,5 @@
 from flask import Flask
-from app_config import Config, create_app
+from config import Config, create_app
 from Alunos.alunos_routes import alunos_bp
 from Turma.turma_routes import turma_bp
 from Professor.professor_routes import professor_bp

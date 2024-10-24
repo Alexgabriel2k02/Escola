@@ -1,4 +1,4 @@
-from app_config import db
+from config import db
 from datetime import date
 
 class Aluno(db.Model):
