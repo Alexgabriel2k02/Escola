@@ -1,7 +1,13 @@
-# aluno/__init__.py
 from flask import Blueprint
 
-aluno_bp = Blueprint('aluno', __name__)
+# Criação do Blueprint
+alunos_bp = Blueprint('aluno', __name__)
 
-# Aqui você pode importar as rotas, se necessário
-from .alunos_routes import *
+# Importar as rotas
+from .alunos_routes import alunos_blueprint
+
+# Registrar o blueprint das rotas no blueprint principal
+alunos_bp.register_blueprint(alunos_blueprint)
+
+# Se necessário, você também pode importar os modelos aqui
+from .alunos_model import Aluno  # Importando o modelo Aluno
